@@ -1,12 +1,12 @@
 package cz.kribsky.pdfparser.domain;
 
-import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Data
 
-public class Wagon {
+public class Wagon implements CsvFormat {
     int order;
     String wagonNumber;
     // pocet naprav
@@ -19,4 +19,34 @@ public class Wagon {
     int breake;
     int weightBreaking;
     int maxSpeed;
+
+    @Override
+    public List<String> getCsvFormat() {
+        return List.of(
+                String.valueOf(order),
+                String.valueOf(wagonNumber),
+                String.valueOf(numberOfAxles),
+                String.valueOf(lengthOfWagon),
+                String.valueOf(weight),
+                String.valueOf(zasHmot),
+                String.valueOf(breake),
+                String.valueOf(weightBreaking),
+                String.valueOf(maxSpeed)
+        );
+    }
+
+    @Override
+    public String[] getHeader() {
+        return new String[]{
+                "Poř",
+                "Označení vozu",
+                "PočNapr",
+                "VůzDel",
+                "VůzHmotn",
+                "ZasHmot",
+                "Brzd",
+                "BrzdHmotn",
+                "MaxRychl"
+        };
+    }
 }

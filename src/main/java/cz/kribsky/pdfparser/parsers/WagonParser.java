@@ -12,13 +12,14 @@ public class WagonParser implements ParsingInterface<Wagon> {
      * Poř Označení vozu PočNapr VůzDel VůzHmotn ZasHmot Brzd BrzdHmotn MaxRychl
      * 1 33 52 5412 025-6 4 2170 26500 0 100
      */
-    public static final Pattern PATTERN = Pattern.compile("(?<order>\\d+)\\s" +
+    private static final Pattern PATTERN = Pattern.compile("(?<order>\\d+)\\s" +
             "(?<wagonNumber>(\\d+\\s)+\\d+-\\d+)\\s" +
             "(?<numberOfAxles>\\d+)\\s" +
             "(?<lengthOfWagon>\\d+)\\s" +
             "(?<weight>\\d+)\\s" +
             "(?<zasHmot>\\d+)\\s" +
             "(?<maxSpeed>\\d+)");
+    public static final String HEADER = "Poř Označení vozu PočNapr VůzDel VůzHmotn ZasHmot Brzd BrzdHmotn MaxRychl";
 
     @Override
     public boolean shouldConsumeLine(String s) {
@@ -28,7 +29,7 @@ public class WagonParser implements ParsingInterface<Wagon> {
 
     @Override
     public boolean isHeader(String s) {
-        return s.trim().equals("Poř Označení vozu PočNapr VůzDel VůzHmotn ZasHmot Brzd BrzdHmotn MaxRychl");
+        return s.trim().equals(HEADER);
     }
 
     @Override

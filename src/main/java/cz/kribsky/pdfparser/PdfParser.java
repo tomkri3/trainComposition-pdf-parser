@@ -55,6 +55,7 @@ public class PdfParser {
     }
 
     private String parsePlainTextByTika(Path pathToFile) throws IOException, SAXException, TikaException {
+        Preconditions.checkArgument(Files.exists(pathToFile), "File %s does not exist!", pathToFile.toString());
         Preconditions.checkArgument(Files.isReadable(pathToFile), "File %s is not readable!", pathToFile.toString());
 
 
