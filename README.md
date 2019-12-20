@@ -13,3 +13,4 @@ it wil create ouput file which is at the same directory as input + suffix `_conv
 ## Example usage
 
 `java -jar /path/to/jar/trainComposition-pdf-parser-1.0-jar-with-dependencies.jar "/path/to/pdfFile/SlozeniVlaku (35).pdf"`
+
