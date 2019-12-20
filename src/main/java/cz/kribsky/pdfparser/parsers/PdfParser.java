@@ -1,4 +1,4 @@
-package cz.kribsky.pdfparser;
+package cz.kribsky.pdfparser.parsers;
 
 import com.google.common.base.Preconditions;
 import cz.kribsky.pdfparser.parsers.ParsingInterface;
@@ -22,13 +22,13 @@ import java.util.List;
 
 public class PdfParser {
 
-    Collection<Wagon> parse(Path pathToFile) throws IOException, TikaException, SAXException {
+    public List<Wagon> parse(Path pathToFile) throws IOException, TikaException, SAXException {
         String plainText = parsePlainTextByTika(pathToFile);
         final String[] split = plainText.split("\n");
         return parseWagons(split);
     }
 
-    private Collection<Wagon> parseWagons(String[] split) {
+    private List<Wagon> parseWagons(String[] split) {
         List<Wagon> wagons = new ArrayList<>();
         final WagonParser parser = new WagonParser();
         int startWagonPart = findStart(split, parser);
@@ -57,7 +57,6 @@ public class PdfParser {
     private String parsePlainTextByTika(Path pathToFile) throws IOException, SAXException, TikaException {
         Preconditions.checkArgument(Files.exists(pathToFile), "File %s does not exist!", pathToFile.toString());
         Preconditions.checkArgument(Files.isReadable(pathToFile), "File %s is not readable!", pathToFile.toString());
-
 
         //parse method parameters
         Parser parser = new AutoDetectParser();

@@ -2,23 +2,22 @@ package cz.kribsky.pdfparser;
 
 import com.google.common.collect.Iterables;
 import cz.kribsky.pdfparser.domain.CsvFormat;
+import cz.kribsky.pdfparser.printers.PrinterInterface;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Collection;
+import java.nio.charset.Charset;
 import java.util.List;
 
-import static cz.kribsky.pdfparser.parsers.WagonParser.HEADER;
-
-public class CsvPrinter {
+public class CsvPrinter implements PrinterInterface {
 
     public static final char DELIMITER = ',';
 
-    void printToFile(Collection<? extends CsvFormat> wagons, File file) throws IOException {
-        FileWriter out = new FileWriter(file);
+    @Override
+    public void printToFile(List<? extends CsvFormat> wagons, File file) throws Exception {
+        FileWriter out = new FileWriter(file, Charset.forName("WINDOWS-1250"));
         final String[] header = Iterables.getFirst(wagons, null).getHeader();
         final CSVFormat format = CSVFormat.DEFAULT.withHeader(header).withDelimiter(DELIMITER);
         try (CSVPrinter printer = new CSVPrinter(out, format)) {

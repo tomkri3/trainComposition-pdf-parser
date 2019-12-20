@@ -3,6 +3,7 @@ package cz.kribsky.pdfparser;
 
 import com.google.common.io.Resources;
 import cz.kribsky.pdfparser.domain.Wagon;
+import cz.kribsky.pdfparser.parsers.PdfParser;
 import org.apache.tika.exception.TikaException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
