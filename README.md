@@ -4,6 +4,9 @@ simple application for parsing pdf then exporting to csv file
 ## Requirements
 java 11 in system which we want to run
 
+## Directory with runnable output
+https://github.com/tomkri3/trainComposition-pdf-parser/tree/master/builded-jars
+
 ## Inputs
 as input it take exactly one argumnet which is path to file
 
