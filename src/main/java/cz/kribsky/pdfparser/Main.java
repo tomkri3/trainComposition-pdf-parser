@@ -13,7 +13,7 @@ import java.util.List;
 
 public class Main {
 
-    public static final String OUTPUT_SUFFIX = "_converted.xslx";
+    public static final String OUTPUT_SUFFIX = "_converted.xlsx";
 
     public static void main(String[] args) throws Exception {
         Preconditions.checkArgument(args.length == 1, "Expecting exactly one argument but got %s", args.length);
