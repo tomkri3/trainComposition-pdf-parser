@@ -22,8 +22,13 @@ import java.util.List;
 
 public class ParserComposition {
 
-    public TrainCompost parseCompost(Path pathToFile) throws TikaException, SAXException, IOException {
-        final String[] lines = parsePlainTextByTika(pathToFile).split("\n");
+    public TrainCompost parseCompost(Path pathToFile) {
+        String[] lines = null;
+        try {
+            lines = parsePlainTextByTika(pathToFile).split("\n");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
 
         final Train train = TrainParser.combine(parseToCollection(lines, new TrainParser()));

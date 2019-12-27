@@ -20,7 +20,7 @@ public class TrainMetaInfo implements PrintableInterface {
 
 
     @Override
-    public List<String> getPrintableValues() {
+    public List<String> getRowData() {
         return List.of(
                 weight.toString(),
                 length.toString(),

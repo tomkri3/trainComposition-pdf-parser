@@ -9,7 +9,7 @@ public class Engine implements PrintableInterface {
     private String designationNumber;
 
     @Override
-    public List<String> getPrintableValues() {
+    public List<String> getRowData() {
         return List.of(designationNumber);
     }
 

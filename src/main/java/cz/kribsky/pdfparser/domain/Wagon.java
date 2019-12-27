@@ -20,7 +20,7 @@ public class Wagon implements PrintableInterface {
     int maxSpeed;
 
     @Override
-    public List<String> getPrintableValues() {
+    public List<String> getRowData() {
         return List.of(
                 String.valueOf(order),
                 String.valueOf(wagonNumber),
