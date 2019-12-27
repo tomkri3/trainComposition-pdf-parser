@@ -2,8 +2,8 @@ package cz.kribsky.pdfparser.domain;
 
 import java.util.List;
 
-public interface CsvFormat {
-    List<String> getCsvFormat();
+public interface PrintableInterface {
+    List<String> getPrintableValues();
 
     String[] getHeader();
 }

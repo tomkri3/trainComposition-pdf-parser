@@ -1,10 +1,11 @@
 package cz.kribsky.pdfparser.parsers;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
+import cz.kribsky.pdfparser.domain.PrintableInterface;
 
-public interface ParsingInterface<T> {
+public interface ParsingInterface<T extends PrintableInterface> {
     boolean shouldConsumeLine(String s);
+
     boolean isHeader(String s);
+
     T parse(String s);
 }

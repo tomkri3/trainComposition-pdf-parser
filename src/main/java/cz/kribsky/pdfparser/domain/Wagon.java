@@ -5,8 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-
-public class Wagon implements CsvFormat {
+public class Wagon implements PrintableInterface {
     int order;
     String wagonNumber;
     // pocet naprav
@@ -21,7 +20,7 @@ public class Wagon implements CsvFormat {
     int maxSpeed;
 
     @Override
-    public List<String> getCsvFormat() {
+    public List<String> getPrintableValues() {
         return List.of(
                 String.valueOf(order),
                 String.valueOf(wagonNumber),

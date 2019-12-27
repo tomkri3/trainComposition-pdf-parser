@@ -1,9 +1,10 @@
 package cz.kribsky.pdfparser.parsers;
 
 import com.google.common.base.Preconditions;
-import cz.kribsky.pdfparser.parsers.ParsingInterface;
-import cz.kribsky.pdfparser.domain.Wagon;
-import cz.kribsky.pdfparser.parsers.WagonParser;
+import com.google.common.collect.Iterables;
+import cz.kribsky.pdfparser.domain.PrintableInterface;
+import cz.kribsky.pdfparser.domain.Train;
+import cz.kribsky.pdfparser.domain.TrainCompost;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -17,26 +18,35 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-public class PdfParser {
+public class ParserComposition {
 
-    public List<Wagon> parse(Path pathToFile) throws IOException, TikaException, SAXException {
-        String plainText = parsePlainTextByTika(pathToFile);
-        final String[] split = plainText.split("\n");
-        return parseWagons(split);
+    public TrainCompost parseCompost(Path pathToFile) throws TikaException, SAXException, IOException {
+        final String[] lines = parsePlainTextByTika(pathToFile).split("\n");
+
+
+        final Train train = TrainParser.combine(parseToCollection(lines, new TrainParser()));
+        return new TrainCompost(
+                train,
+                parseSingle(lines, new TrainMetaInfoParser()),
+                parseToCollection(lines, new WagonParser()),
+                parseToCollection(lines, new EngineParser())
+        );
     }
 
-    private List<Wagon> parseWagons(String[] split) {
-        List<Wagon> wagons = new ArrayList<>();
-        final WagonParser parser = new WagonParser();
-        int startWagonPart = findStart(split, parser);
+    private <T extends PrintableInterface> T parseSingle(String[] lines, ParsingInterface<T> parsingInterface) {
+        return Iterables.getOnlyElement(parseToCollection(lines, parsingInterface));
+    }
 
-        for (int i = startWagonPart +1 ; i < split.length; i++) {
-            String s = split[i];
-            if(parser.shouldConsumeLine(s)){
-                wagons.add(parser.parse(s));
+    private <T extends PrintableInterface> List<T> parseToCollection(String[] lines, ParsingInterface<T> parsingInterface) {
+        List<T> wagons = new ArrayList<>();
+        int startWagonPart = findStart(lines, parsingInterface);
+
+        for (int i = startWagonPart; i < lines.length; i++) {
+            String s = lines[i];
+            if (parsingInterface.shouldConsumeLine(s)) {
+                wagons.add(parsingInterface.parse(s));
             }
         }
 
@@ -46,8 +56,9 @@ public class PdfParser {
     private int findStart(String[] split, ParsingInterface parser) {
         for (int i = 0; i < split.length; i++) {
             String s = split[i];
-            if(parser.isHeader(s)){
-                return i;
+            if (parser.isHeader(s)) {
+                // +1 to return first non header line
+                return i + 1;
             }
         }
 

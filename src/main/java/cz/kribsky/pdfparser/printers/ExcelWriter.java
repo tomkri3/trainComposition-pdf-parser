@@ -1,7 +1,7 @@
 package cz.kribsky.pdfparser.printers;
 
 import com.google.common.collect.Iterables;
-import cz.kribsky.pdfparser.domain.CsvFormat;
+import cz.kribsky.pdfparser.domain.PrintableInterface;
 import org.apache.poi.xssf.usermodel.*;
 
 import java.io.File;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ExcelWriter implements PrinterInterface {
     @Override
-    public void printToFile(List<? extends CsvFormat> wagons, File file) throws Exception {
+    public void printToFile(List<? extends PrintableInterface> wagons, File file) throws Exception {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             final XSSFSheet sheet = workbook.createSheet(file.getName());
 
@@ -26,11 +26,11 @@ public class ExcelWriter implements PrinterInterface {
         }
     }
 
-    private void printRows(List<? extends CsvFormat> wagons, XSSFSheet sheet) {
+    private void printRows(List<? extends PrintableInterface> wagons, XSSFSheet sheet) {
         for (int i = 0; i < wagons.size(); i++) {
-            final CsvFormat wagon = wagons.get(i);
+            final PrintableInterface wagon = wagons.get(i);
             // +1 bcs first is header
-            fillRow(wagon.getCsvFormat(), sheet.createRow(i + 1));
+            fillRow(wagon.getPrintableValues(), sheet.createRow(i + 1));
         }
     }
 
