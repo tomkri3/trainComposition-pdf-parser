@@ -6,6 +6,7 @@ import cz.kribsky.pdfparser.domain.TrainCompost;
 import cz.kribsky.pdfparser.domain.Wagon;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class TrainCompostPrintable {
@@ -42,17 +43,27 @@ public class TrainCompostPrintable {
 
     private List<String> buildData(List<Wagon> wagons, final int i) {
         final List<String> rowData = new ArrayList<>(wagons.get(i).getRowData());
-        if(i == 0) {
+        if (i == 0) {
             rowData.addAll(trainCompost.getTrainMetaInfo().getRowData());
+        } else {
+            rowData.addAll(buildEmptyStrings(trainCompost.getTrainMetaInfo().getRowData().size()));
         }
-        if(i < trainCompost.getEngines().size()){
+        if (i < trainCompost.getEngines().size()) {
             final Engine engine = trainCompost.getEngines().get(i);
             rowData.addAll(engine.getRowData());
         }
-        if(i == 0) {
+        if (i == 0) {
             rowData.addAll(trainCompost.getTrain().getRowData());
         }
         return rowData;
+    }
+
+    private Collection<? extends String> buildEmptyStrings(int size) {
+        List<String> strings = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            strings.add("");
+        }
+        return strings;
     }
 
     public String[] getFullHeader() {

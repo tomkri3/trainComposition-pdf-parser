@@ -8,11 +8,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ExcelPrinter implements PrinterInterface, AutoCloseable {
 
     private final XSSFWorkbook workbook = new XSSFWorkbook();
     private XSSFSheet sheet;
+    private final AtomicInteger integer = new AtomicInteger();
 
     @Override
     public void init(File file, List<? extends PrintableInterface> printableInterfaces) {
@@ -25,16 +27,14 @@ public class ExcelPrinter implements PrinterInterface, AutoCloseable {
         // Fill header
         fillRow(
                 header,
-                sheet.createRow(0)
+                sheet.createRow(integer.getAndIncrement())
         );
     }
 
     @Override
     public void printCollection(List<? extends PrintableInterface> printableInterfaces)  {
-        for (int i = 0; i < printableInterfaces.size(); i++) {
-            final PrintableInterface wagon = printableInterfaces.get(i);
-            // +1 bcs first is header
-            fillRow(wagon.getRowData(), sheet.createRow(i + 1));
+        for (PrintableInterface printableInterface : printableInterfaces) {
+            fillRow(printableInterface.getRowData(), sheet.createRow(integer.getAndIncrement()));
         }
     }
 
