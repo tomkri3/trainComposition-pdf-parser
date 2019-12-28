@@ -1,9 +1,6 @@
 package cz.kribsky.pdfparser.printers;
 
-import cz.kribsky.pdfparser.domain.Engine;
-import cz.kribsky.pdfparser.domain.PrintableInterface;
-import cz.kribsky.pdfparser.domain.TrainCompost;
-import cz.kribsky.pdfparser.domain.Wagon;
+import cz.kribsky.pdfparser.domain.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,10 +40,11 @@ public class TrainCompostPrintable {
 
     private List<String> buildData(List<Wagon> wagons, final int i) {
         final List<String> rowData = new ArrayList<>(wagons.get(i).getRowData());
-        if (i == 0) {
-            rowData.addAll(trainCompost.getTrainMetaInfo().getRowData());
+        if (i < trainCompost.getTrainMetaInfo().size()) {
+            TrainMetaInfo trainMetaInfo = trainCompost.getTrainMetaInfo().get(i);
+            rowData.addAll(trainMetaInfo.getRowData());
         } else {
-            rowData.addAll(buildEmptyStrings(trainCompost.getTrainMetaInfo().getRowData().size()));
+            rowData.addAll(buildEmptyStrings(trainCompost.getTrainMetaInfo().stream().findAny().orElseThrow().getRowData().size()));
         }
         if (i < trainCompost.getEngines().size()) {
             final Engine engine = trainCompost.getEngines().get(i);
@@ -69,7 +67,7 @@ public class TrainCompostPrintable {
     public String[] getFullHeader() {
         return concat(
                 trainCompost.getWagons().stream().findAny().orElseThrow().getHeader(),
-                trainCompost.getTrainMetaInfo().getHeader(),
+                trainCompost.getTrainMetaInfo().stream().findAny().orElseThrow().getHeader(),
                 trainCompost.getEngines().stream().findAny().orElseThrow().getHeader(),
                 trainCompost.getTrain().getHeader()
         );

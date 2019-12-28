@@ -1,6 +1,5 @@
 package cz.kribsky.pdfparser;
 
-import com.google.common.io.Resources;
 import org.junit.jupiter.api.Assertions;
 
 import java.nio.file.Files;
@@ -9,10 +8,16 @@ import java.nio.file.Paths;
 
 public class CommonTests {
 
-    public static Path getPdfPath() {
-        final String path = Resources.getResource("SlozeniVlaku(35).pdf").getPath();
-        final Path pathToFile = Paths.get(path);
+    public static Path getPdfPath35() {
+        final Path pathToFile = Paths.get("src", "test", "resources", "SlozeniVlaku(35).pdf");
         Assertions.assertTrue(Files.exists(pathToFile));
+        return pathToFile;
+    }
+
+    public static Path getPdfPath74() {
+        final Path pathToFile = Paths.get("src", "test", "resources", "SlozeniVlaku (74).pdf");
+        Assertions.assertTrue(Files.exists(pathToFile));
+        Assertions.assertTrue(Files.isReadable(pathToFile));
         return pathToFile;
     }
 }

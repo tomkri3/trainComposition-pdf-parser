@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import cz.kribsky.pdfparser.domain.PrintableInterface;
 import cz.kribsky.pdfparser.domain.Train;
 import cz.kribsky.pdfparser.domain.TrainCompost;
+import cz.kribsky.pdfparser.domain.TrainMetaInfo;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -18,30 +19,49 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ParserComposition {
+
+    private final boolean throwExceptionWhenRaised;
+    private final ParseMonitor parseMonitor = new ParseMonitor();
+
+    public ParserComposition(boolean throwExceptionWhenRaised) {
+        this.throwExceptionWhenRaised = throwExceptionWhenRaised;
+    }
+
+    public ParserComposition() {
+        this(true);
+    }
 
     public TrainCompost parseCompost(Path pathToFile) {
         String[] lines = null;
         try {
             lines = parsePlainTextByTika(pathToFile).split("\n");
+
+            final Train train = TrainParser.combine(parseToCollection(lines, new TrainParser()));
+            TrainCompost trainCompost = new TrainCompost(
+                    train,
+                    parseToCollection(lines, new TrainMetaInfoParser()),
+                    parseToCollection(lines, new WagonParser()),
+                    parseToCollection(lines, new EngineParser())
+            );
+            parseMonitor.addSuccesFull(pathToFile);
+            return trainCompost;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            String x = "Exception when processing file: '" + pathToFile.toAbsolutePath().toString() + "'";
+            parseMonitor.addException(e, x);
+            if(throwExceptionWhenRaised){
+                throw new RuntimeException(e);
+            } else {
+                return new TrainCompost(new Train(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+            }
         }
-
-
-        final Train train = TrainParser.combine(parseToCollection(lines, new TrainParser()));
-        return new TrainCompost(
-                train,
-                parseSingle(lines, new TrainMetaInfoParser()),
-                parseToCollection(lines, new WagonParser()),
-                parseToCollection(lines, new EngineParser())
-        );
     }
 
-    private <T extends PrintableInterface> T parseSingle(String[] lines, ParsingInterface<T> parsingInterface) {
-        return Iterables.getOnlyElement(parseToCollection(lines, parsingInterface));
+    public ParseMonitor getParseMonitor() {
+        return parseMonitor;
     }
 
     private <T extends PrintableInterface> List<T> parseToCollection(String[] lines, ParsingInterface<T> parsingInterface) {
@@ -67,7 +87,7 @@ public class ParserComposition {
             }
         }
 
-        throw new IllegalStateException("Should not get here!!!");
+        throw new IllegalStateException("Could not find start for " + parser.getClass().getCanonicalName());
     }
 
     private String parsePlainTextByTika(Path pathToFile) throws IOException, SAXException, TikaException {

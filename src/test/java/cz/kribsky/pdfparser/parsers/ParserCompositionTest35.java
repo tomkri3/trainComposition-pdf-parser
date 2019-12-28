@@ -6,21 +6,19 @@ import cz.kribsky.pdfparser.domain.Engine;
 import cz.kribsky.pdfparser.domain.Train;
 import cz.kribsky.pdfparser.domain.TrainMetaInfo;
 import cz.kribsky.pdfparser.domain.Wagon;
-import org.apache.tika.exception.TikaException;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ParserCompositionTest {
+class ParserCompositionTest35 {
 
     @Test
-    void shouldParseCorrectlyWagons() throws IOException, TikaException, SAXException {
-        final Path pathToFile = CommonTests.getPdfPath();
+    void shouldParseCorrectlyWagons() {
+        final Path pathToFile = CommonTests.getPdfPath35();
         final Collection<Wagon> parse = new ParserComposition().parseCompost(pathToFile).getWagons();
 
         assertThat(parse)
@@ -29,8 +27,8 @@ class ParserCompositionTest {
     }
 
     @Test
-    void shouldParseCorrectlyTrain() throws IOException, TikaException, SAXException {
-        final Path pathToFile = CommonTests.getPdfPath();
+    void shouldParseCorrectlyTrain() {
+        final Path pathToFile = CommonTests.getPdfPath35();
 
         final Train parse = new ParserComposition().parseCompost(pathToFile).getTrain();
 
@@ -45,10 +43,10 @@ class ParserCompositionTest {
     }
 
     @Test
-    void shouldParseCorrectlyTrainMetaInfo() throws IOException, TikaException, SAXException {
-        final Path pathToFile = CommonTests.getPdfPath();
+    void shouldParseCorrectlyTrainMetaInfo() {
+        final Path pathToFile = CommonTests.getPdfPath35();
 
-        final TrainMetaInfo parse = new ParserComposition().parseCompost(pathToFile).getTrainMetaInfo();
+        List<TrainMetaInfo> trainMetaInfo = new ParserComposition().parseCompost(pathToFile).getTrainMetaInfo();
 
         final TrainMetaInfo metaInfo = new TrainMetaInfo();
         metaInfo.setWeight(763);
@@ -63,14 +61,14 @@ class ParserCompositionTest {
         metaInfo.setNebV(Integer.parseInt("0"));
         metaInfo.setAlive("0");
 
-        assertThat(parse)
+        assertThat(trainMetaInfo)
                 .isNotNull()
-                .isEqualTo(metaInfo);
+                .containsExactly(metaInfo);
     }
 
     @Test
-    void shouldParseCorrectlyEngines() throws IOException, TikaException, SAXException {
-        final Path pathToFile = CommonTests.getPdfPath();
+    void shouldParseCorrectlyEngines() {
+        final Path pathToFile = CommonTests.getPdfPath35();
 
         final Engine expected = new Engine();
         expected.setDesignationNumber("91 80 6193 750-7");
@@ -79,7 +77,6 @@ class ParserCompositionTest {
                 .isNotNull()
                 .containsExactly(expected);
     }
-
 
 
 }

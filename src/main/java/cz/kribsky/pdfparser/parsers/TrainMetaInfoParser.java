@@ -12,15 +12,16 @@ import java.util.regex.Pattern;
 public class TrainMetaInfoParser implements ParsingInterface<TrainMetaInfo> {
     private static final Pattern SHOULD_CONSUME_PATTERN = Pattern.compile("([\\da-žA-Ž]+\\s){10}");
     public static final Pattern SPLITTING_PATTERN = Pattern.compile("[\\da-žA-Ž]+\\s?");
+    public static final String HEADER = "HmotnVl DélkaVl PočVz PočNapr HmotnostZas MaxRychl Brzd TypVl MimZ NebV Živé";
 
     @Override
     public boolean shouldConsumeLine(String s) {
-        return SHOULD_CONSUME_PATTERN.matcher(s).find();
+        return SHOULD_CONSUME_PATTERN.matcher(s).find() && !s.equals(HEADER);
     }
 
     @Override
     public boolean isHeader(String s) {
-        return s.equals("HmotnVl DélkaVl PočVz PočNapr HmotnostZas MaxRychl Brzd TypVl MimZ NebV Živé");
+        return s.equals(HEADER);
     }
 
     @Override

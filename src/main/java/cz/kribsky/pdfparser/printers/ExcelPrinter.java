@@ -7,6 +7,7 @@ import org.apache.poi.xssf.usermodel.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,7 +24,17 @@ public class ExcelPrinter implements PrinterInterface, AutoCloseable {
 
     @Override
     public void printHeader(List<? extends PrintableInterface> printableInterfaces) {
-        final List<String> header = List.of(Iterables.getFirst(printableInterfaces, null).getHeader());
+        final List<String> header = List.of(Iterables.getFirst(printableInterfaces, new PrintableInterface() {
+            @Override
+            public List<String> getRowData() {
+                return Collections.emptyList();
+            }
+
+            @Override
+            public String[] getHeader() {
+                return new String[0];
+            }
+        }).getHeader());
         // Fill header
         fillRow(
                 header,
@@ -41,11 +52,12 @@ public class ExcelPrinter implements PrinterInterface, AutoCloseable {
     @Override
     public void writeAndFinish(File file) throws IOException {
         // TODO remove magic number!
-        autosizeAllCollumns(sheet, 64);
+//        autosizeAllCollumns(sheet, 64);
         workbook.write(Files.newOutputStream(file.toPath()));
     }
 
     private void autosizeAllCollumns(XSSFSheet sheet, int headerSize) {
+        System.out.println("Autosizing excel cells ...");
         for (int i = 0; i < headerSize; i++) {
             sheet.autoSizeColumn(i);
         }
