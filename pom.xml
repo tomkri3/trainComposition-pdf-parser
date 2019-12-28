@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>trainComposition-pdf-parser</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
     <build>
         <plugins>
             <plugin>

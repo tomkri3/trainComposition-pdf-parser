@@ -1,5 +1,10 @@
 # trainComposition-pdf-parser
 
+## Versions
+- 1.0 first version
+- 1.1 another
+- 1.2 exception swallowing, better error log, more TraiMetaInfo in one pdf
+
 simple application for parsing pdf then exporting to csv file
 ## Requirements
 java 11 in system which we want to run
