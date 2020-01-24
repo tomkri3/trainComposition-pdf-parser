@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ParserCompositionTest74 {
+class ParserComposition74Test {
 
     @Test
     void shouldParseCorrectlyWagons() {
@@ -84,11 +84,17 @@ class ParserCompositionTest74 {
         final Path pathToFile = CommonTests.getPdfPath74();
 
         final Engine expected = new Engine();
-        expected.setDesignationNumber("91 80 6193 750-7");
+        expected.setDesignationNumber("91 51 3150 517-3");
+
+        final Engine expected2 = new Engine();
+        expected2.setDesignationNumber("91 51 3150 517-3");
+
+        final Engine expected3 = new Engine();
+        expected3.setDesignationNumber("91 56 6183 004-1");
 
         assertThat(new ParserComposition().parseCompost(pathToFile).getEngines())
                 .isNotNull()
-                .containsExactly(expected);
+                .containsExactly(expected, expected2, expected3);
     }
 
 

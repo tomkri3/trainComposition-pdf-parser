@@ -1,5 +1,6 @@
 package cz.kribsky.pdfparser.domain;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;

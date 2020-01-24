@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ParserCompositionTest35 {
+class ParserComposition35Test {
 
     @Test
     void shouldParseCorrectlyWagons() {
