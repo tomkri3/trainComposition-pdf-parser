@@ -1,6 +1,7 @@
-package cz.kribsky.pdfparser.parsers;
+package cz.kribsky.pdfparser.parsers.domain;
 
 import cz.kribsky.pdfparser.domain.Engine;
+import cz.kribsky.pdfparser.parsers.InputLineParsingInterface;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,7 +10,7 @@ import java.util.regex.Pattern;
  * 37 = "Označení HV        Funkce      Vložené za vozem    Strojvedoucí"
  * 38 = "91 80 6193 750-7   Vlakové     1.                  1"
  */
-public class EngineParser implements ParsingInterface<Engine> {
+public class EngineParser implements InputLineParsingInterface<Engine> {
 
     private static final Pattern ENGINE_PATTERN = Pattern.compile("^((\\d{2}\\s){2}(\\d{4})\\s(\\d{3})-\\d+)");
 

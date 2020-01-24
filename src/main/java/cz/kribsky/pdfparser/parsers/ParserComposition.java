@@ -1,9 +1,8 @@
 package cz.kribsky.pdfparser.parsers;
 
 import com.google.common.base.Preconditions;
-import cz.kribsky.pdfparser.domain.PrintableInterface;
-import cz.kribsky.pdfparser.domain.Train;
-import cz.kribsky.pdfparser.domain.TrainCompost;
+import cz.kribsky.pdfparser.domain.*;
+import cz.kribsky.pdfparser.parsers.domain.*;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -19,8 +18,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ParserComposition {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParserComposition.class);
@@ -42,12 +43,23 @@ public class ParserComposition {
         try {
             lines = parsePlainTextByTika(pathToFile).split("\n");
 
-            final Train train = TrainParser.combine(parseToCollection(lines, new TrainParser()));
+            final List<GroupBuilder.Group> groups = new GroupBuilder(lines)
+                    .groupLinesByHeader(
+                            List.of(
+                                    new EngineParser(),
+                                    new TrainMetaInfoParser(),
+                                    new MainTrainMetaInfoParser(),
+                                    new TrainPathParser(),
+                                    new WagonParser()
+                            )
+                    );
+
+            final List<SinglePath> singlePaths = parseSinglePaths(groups);
+
+            final MainTrainMetaInfo mainTrainMetaInfo = findMainMetaInfo(groups);
             TrainCompost trainCompost = new TrainCompost(
-                    train,
-                    parseToCollection(lines, new TrainMetaInfoParser()),
-                    parseToCollection(lines, new WagonParser()),
-                    parseToCollection(lines, new EngineParser())
+                    mainTrainMetaInfo,
+                    singlePaths
             );
             parseMonitor.addSuccesFull(pathToFile);
             return trainCompost;
@@ -57,39 +69,68 @@ public class ParserComposition {
             if (throwExceptionWhenRaised) {
                 throw new RuntimeException(e);
             } else {
-                return new TrainCompost(new Train(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+                return new TrainCompost(new MainTrainMetaInfo(), Collections.emptyList());
             }
         }
+    }
+
+    private MainTrainMetaInfo findMainMetaInfo(List<GroupBuilder.Group> groups) {
+        final MainTrainMetaInfoParser trainMetaInfoParser = new MainTrainMetaInfoParser();
+        final List<MainTrainMetaInfo> collect = groups.stream()
+                .filter(group -> group.isSameParserClass(MainTrainMetaInfoParser.class))
+                .map(GroupBuilder.Group::getInputLines)
+                .map(trainMetaInfoParser::parse)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        Preconditions.checkArgument(collect.size() == 1,
+                "Is expected that there is exactly one MainTrainMetaInfo but actually was %s",
+                collect.size()
+        );
+        return collect.get(0);
+    }
+
+    private List<SinglePath> parseSinglePaths(List<GroupBuilder.Group> groups) {
+        final List<SinglePath> singlePaths = new ArrayList<>();
+        SinglePath.SinglePathBuilder builder = SinglePath.builder();
+        Class<?> expectedNextParser = null;
+        for (GroupBuilder.Group group : groups) {
+            if (expectedNextParser != null) {
+                Preconditions.checkArgument(group.isSameParserClass(expectedNextParser));
+            }
+            if (group.isSameParserClass(TrainMetaInfoParser.class)) {
+                // first parser
+                Preconditions.checkNotNull(builder);
+                builder = SinglePath.builder();
+
+                builder.trainMetaInfo(
+                        group.getTypedParse(TrainMetaInfoParser.class)
+                                .parseToOnly(group.getInputLines())
+                );
+                expectedNextParser = EngineParser.class;
+            }
+            if (group.isSameParserClass(EngineParser.class)) {
+                builder.engines(
+                        group.getTypedParse(EngineParser.class)
+                                .parse(group.getInputLines())
+                );
+                expectedNextParser = WagonParser.class;
+            }
+            if (group.isSameParserClass(WagonParser.class)) {
+                // last one
+                final List<Wagon> wagons = group.getTypedParse(WagonParser.class).parse(group.getInputLines());
+                builder.wagons(wagons);
+
+                singlePaths.add(builder.build());
+                builder = SinglePath.builder();
+                expectedNextParser = TrainMetaInfoParser.class;
+            }
+        }
+
+        return singlePaths;
     }
 
     public ParseMonitor getParseMonitor() {
         return parseMonitor;
-    }
-
-    private <T extends PrintableInterface> List<T> parseToCollection(String[] lines, ParsingInterface<T> parsingInterface) {
-        List<T> wagons = new ArrayList<>();
-        int startWagonPart = findStart(lines, parsingInterface);
-
-        for (int i = startWagonPart; i < lines.length; i++) {
-            String s = lines[i];
-            if (parsingInterface.shouldConsumeLine(s)) {
-                wagons.add(parsingInterface.parse(s));
-            }
-        }
-
-        return wagons;
-    }
-
-    private int findStart(String[] split, ParsingInterface parser) {
-        for (int i = 0; i < split.length; i++) {
-            String s = split[i];
-            if (parser.isHeader(s)) {
-                // +1 to return first non header line
-                return i + 1;
-            }
-        }
-
-        throw new IllegalStateException("Could not find start for " + parser.getClass().getCanonicalName());
     }
 
     private String parsePlainTextByTika(Path pathToFile) throws IOException, SAXException, TikaException {

@@ -1,11 +1,12 @@
-package cz.kribsky.pdfparser.parsers;
+package cz.kribsky.pdfparser.parsers.domain;
 
 import cz.kribsky.pdfparser.domain.Wagon;
+import cz.kribsky.pdfparser.parsers.InputLineParsingInterface;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class WagonParser implements ParsingInterface<Wagon> {
+public class WagonParser implements InputLineParsingInterface<Wagon> {
 
     /**
      * TODO example, missing some zeroes so its not final regex

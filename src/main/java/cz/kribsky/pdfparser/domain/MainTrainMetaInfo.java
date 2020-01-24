@@ -4,8 +4,11 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Main train Info, its only one times there and on the top
+ */
 @Data
-public class Train implements PrintableInterface {
+public class MainTrainMetaInfo implements PrintableInterface {
     private String fullName;
     private String journeyFrom;
     private String journeyTo;

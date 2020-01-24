@@ -1,7 +1,10 @@
-package cz.kribsky.pdfparser.parsers;
+package cz.kribsky.pdfparser.parsers.domain;
 
 import cz.kribsky.pdfparser.domain.TrainMetaInfo;
+import cz.kribsky.pdfparser.parsers.GroupBuilder;
+import cz.kribsky.pdfparser.parsers.InputLineParsingInterface;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,7 +12,7 @@ import java.util.regex.Pattern;
  * 27 = "HmotnVl DélkaVl PočVz PočNapr HmotnostZas MaxRychl Brzd TypVl MimZ NebV Živé"
  * 28 = "763 562 26 104 673 100 P Nákladní 0 0 0"
  */
-public class TrainMetaInfoParser implements ParsingInterface<TrainMetaInfo> {
+public class TrainMetaInfoParser implements InputLineParsingInterface<TrainMetaInfo> {
     private static final Pattern SHOULD_CONSUME_PATTERN = Pattern.compile("([\\da-žA-Ž]+\\s){10}");
     public static final Pattern SPLITTING_PATTERN = Pattern.compile("[\\da-žA-Ž]+\\s?");
     public static final String HEADER = "HmotnVl DélkaVl PočVz PočNapr HmotnostZas MaxRychl Brzd TypVl MimZ NebV Živé";
@@ -17,6 +20,11 @@ public class TrainMetaInfoParser implements ParsingInterface<TrainMetaInfo> {
     @Override
     public boolean shouldConsumeLine(String s) {
         return SHOULD_CONSUME_PATTERN.matcher(s).find() && !s.equals(HEADER);
+    }
+
+    @Override
+    public List<TrainMetaInfo> parse(List<GroupBuilder.InputLine> inputLines) {
+        return null;
     }
 
     @Override
@@ -30,7 +38,7 @@ public class TrainMetaInfoParser implements ParsingInterface<TrainMetaInfo> {
         matcher.find();
 
         final TrainMetaInfo metaInfo = new TrainMetaInfo();
-//        matcher.grou
+
         metaInfo.setWeight(Integer.parseInt(matcher.group().trim()));
         matcher.find();
 

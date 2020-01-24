@@ -9,8 +9,6 @@ import java.util.List;
  */
 @Data
 public class TrainCompost {
-    private final Train train;
-    private final List<TrainMetaInfo> trainMetaInfo;
-    private final List<Wagon> wagons;
-    private final List<Engine> engines;
+    private final MainTrainMetaInfo mainTrainMetaInfo;
+    private final List<SinglePath> singlePaths;
 }

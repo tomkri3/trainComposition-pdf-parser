@@ -3,7 +3,7 @@ package cz.kribsky.pdfparser.parsers;
 
 import cz.kribsky.pdfparser.CommonTests;
 import cz.kribsky.pdfparser.domain.Engine;
-import cz.kribsky.pdfparser.domain.Train;
+import cz.kribsky.pdfparser.domain.MainTrainMetaInfo;
 import cz.kribsky.pdfparser.domain.TrainMetaInfo;
 import cz.kribsky.pdfparser.domain.Wagon;
 import org.junit.jupiter.api.Test;
@@ -30,9 +30,9 @@ class ParserComposition35Test {
     void shouldParseCorrectlyTrain() {
         final Path pathToFile = CommonTests.getPdfPath35();
 
-        final Train parse = new ParserComposition().parseCompost(pathToFile).getTrain();
+        final MainTrainMetaInfo parse = new ParserComposition().parseCompost(pathToFile).getMainTrainMetaInfo();
 
-        final Train expected = new Train();
+        final MainTrainMetaInfo expected = new MainTrainMetaInfo();
         expected.setJourneyFrom("CZ - 30145 Lanžhot st.hr.");
         expected.setJourneyTo("CZ - 35737 Přibyslav");
         expected.setFullName("049894 TR/3622/-KADR302215-/00/2019/20191203");

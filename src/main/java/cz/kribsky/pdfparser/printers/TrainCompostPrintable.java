@@ -51,7 +51,7 @@ public class TrainCompostPrintable {
             rowData.addAll(engine.getRowData());
         }
         if (i == 0) {
-            rowData.addAll(trainCompost.getTrain().getRowData());
+            rowData.addAll(trainCompost.getMainTrainMetaInfo().getRowData());
         }
         return rowData;
     }
@@ -69,7 +69,7 @@ public class TrainCompostPrintable {
                 trainCompost.getWagons().stream().findAny().orElseThrow().getHeader(),
                 trainCompost.getTrainMetaInfo().stream().findAny().orElseThrow().getHeader(),
                 trainCompost.getEngines().stream().findAny().orElseThrow().getHeader(),
-                trainCompost.getTrain().getHeader()
+                trainCompost.getMainTrainMetaInfo().getHeader()
         );
     }
 
