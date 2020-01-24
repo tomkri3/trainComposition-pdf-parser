@@ -17,22 +17,22 @@ public class TrainCompostPrintable {
     public List<PrintableInterface> getDataRows() {
         List<PrintableInterface> rslt = new ArrayList<>();
 
-        List<Wagon> wagons = trainCompost.getWagons();
-        for (int i = 0; i < wagons.size(); i++) {
-            final List<String> rowData = buildData(wagons, i);
-
-            rslt.add(new PrintableInterface() {
-                @Override
-                public List<String> getRowData() {
-                    return rowData;
-                }
-
-                @Override
-                public String[] getHeader() {
-                    return getFullHeader();
-                }
-            });
-        }
+//        List<Wagon> wagons = trainCompost.getWagons();
+//        for (int i = 0; i < wagons.size(); i++) {
+//            final List<String> rowData = buildData(wagons, i);
+//
+//            rslt.add(new PrintableInterface() {
+//                @Override
+//                public List<String> getRowData() {
+//                    return rowData;
+//                }
+//
+//                @Override
+//                public String[] getHeader() {
+//                    return getFullHeader();
+//                }
+//            });
+//        }
 
 
         return rslt;
@@ -40,16 +40,16 @@ public class TrainCompostPrintable {
 
     private List<String> buildData(List<Wagon> wagons, final int i) {
         final List<String> rowData = new ArrayList<>(wagons.get(i).getRowData());
-        if (i < trainCompost.getTrainMetaInfo().size()) {
-            TrainMetaInfo trainMetaInfo = trainCompost.getTrainMetaInfo().get(i);
-            rowData.addAll(trainMetaInfo.getRowData());
-        } else {
-            rowData.addAll(buildEmptyStrings(trainCompost.getTrainMetaInfo().stream().findAny().orElseThrow().getRowData().size()));
-        }
-        if (i < trainCompost.getEngines().size()) {
-            final Engine engine = trainCompost.getEngines().get(i);
-            rowData.addAll(engine.getRowData());
-        }
+//        if (i < trainCompost.getTrainMetaInfo().size()) {
+//            TrainMetaInfo trainMetaInfo = trainCompost.getTrainMetaInfo().get(i);
+//            rowData.addAll(trainMetaInfo.getRowData());
+//        } else {
+//            rowData.addAll(buildEmptyStrings(trainCompost.getTrainMetaInfo().stream().findAny().orElseThrow().getRowData().size()));
+//        }
+//        if (i < trainCompost.getEngines().size()) {
+//            final Engine engine = trainCompost.getEngines().get(i);
+//            rowData.addAll(engine.getRowData());
+//        }
         if (i == 0) {
             rowData.addAll(trainCompost.getMainTrainMetaInfo().getRowData());
         }
@@ -66,9 +66,9 @@ public class TrainCompostPrintable {
 
     public String[] getFullHeader() {
         return concat(
-                trainCompost.getWagons().stream().findAny().orElseThrow().getHeader(),
-                trainCompost.getTrainMetaInfo().stream().findAny().orElseThrow().getHeader(),
-                trainCompost.getEngines().stream().findAny().orElseThrow().getHeader(),
+//                trainCompost.getWagons().stream().findAny().orElseThrow().getHeader(),
+//                trainCompost.getTrainMetaInfo().stream().findAny().orElseThrow().getHeader(),
+//                trainCompost.getEngines().stream().findAny().orElseThrow().getHeader(),
                 trainCompost.getMainTrainMetaInfo().getHeader()
         );
     }

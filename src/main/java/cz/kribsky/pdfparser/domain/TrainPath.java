@@ -1,10 +1,12 @@
 package cz.kribsky.pdfparser.domain;
 
+import lombok.Builder;
 import lombok.Value;
 
 import java.util.List;
 
 @Value
+@Builder
 public class TrainPath implements PrintableInterface {
     String fromStation;
     String toStation;

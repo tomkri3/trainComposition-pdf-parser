@@ -1,7 +1,10 @@
 package cz.kribsky.pdfparser.parsers;
 
 import com.google.common.base.Preconditions;
-import cz.kribsky.pdfparser.domain.*;
+import cz.kribsky.pdfparser.domain.MainTrainMetaInfo;
+import cz.kribsky.pdfparser.domain.PrintableInterface;
+import cz.kribsky.pdfparser.domain.SinglePath;
+import cz.kribsky.pdfparser.domain.TrainCompost;
 import cz.kribsky.pdfparser.parsers.domain.*;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -18,9 +21,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ParserComposition {
@@ -41,7 +45,9 @@ public class ParserComposition {
         LOGGER.info("Processing file: {}", pathToFile.toAbsolutePath());
         String[] lines;
         try {
-            lines = parsePlainTextByTika(pathToFile).split("\n");
+            lines = parseToPlainTextByTika(pathToFile).split("\n");
+            LOGGER.debug("Parsed PDF is");
+            LOGGER.debug(String.join("\n", lines));
 
             final List<GroupBuilder.Group> groups = new GroupBuilder(lines)
                     .groupLinesByHeader(
@@ -79,8 +85,7 @@ public class ParserComposition {
         final List<MainTrainMetaInfo> collect = groups.stream()
                 .filter(group -> group.isSameParserClass(MainTrainMetaInfoParser.class))
                 .map(GroupBuilder.Group::getInputLines)
-                .map(trainMetaInfoParser::parse)
-                .flatMap(Collection::stream)
+                .map(trainMetaInfoParser::parseToOne)
                 .collect(Collectors.toList());
         Preconditions.checkArgument(collect.size() == 1,
                 "Is expected that there is exactly one MainTrainMetaInfo but actually was %s",
@@ -93,47 +98,70 @@ public class ParserComposition {
         final List<SinglePath> singlePaths = new ArrayList<>();
         SinglePath.SinglePathBuilder builder = SinglePath.builder();
         Class<?> expectedNextParser = null;
+        LOGGER.debug("Groups {}",groups.stream().map(GroupBuilder.Group::debugOutput).collect(Collectors.joining("\n")));
+
         for (GroupBuilder.Group group : groups) {
             if (expectedNextParser != null) {
-                Preconditions.checkArgument(group.isSameParserClass(expectedNextParser));
+                Preconditions.checkArgument(
+                        group.isSameParserClass(expectedNextParser),
+                        "Expecting group %s but found %s", expectedNextParser.getName(), group.getTypedParser(InputLineParsingInterface.class)
+                );
             }
-            if (group.isSameParserClass(TrainMetaInfoParser.class)) {
+
+            if (group.isSameParserClass(TrainPathParser.class)) {
                 // first parser
                 Preconditions.checkNotNull(builder);
                 builder = SinglePath.builder();
+                parseAndSet(group, builder::trainPath, TrainPathParser.class);
+                expectedNextParser = TrainMetaInfoParser.class;
+            }
 
-                builder.trainMetaInfo(
-                        group.getTypedParse(TrainMetaInfoParser.class)
-                                .parseToOnly(group.getInputLines())
-                );
+            if (group.isSameParserClass(TrainMetaInfoParser.class)) {
+                parseAndSet(group, builder::trainMetaInfo, TrainMetaInfoParser.class);
                 expectedNextParser = EngineParser.class;
             }
             if (group.isSameParserClass(EngineParser.class)) {
-                builder.engines(
-                        group.getTypedParse(EngineParser.class)
-                                .parse(group.getInputLines())
-                );
+                parseAndSet(group, builder::engines, EngineParser.class);
                 expectedNextParser = WagonParser.class;
             }
             if (group.isSameParserClass(WagonParser.class)) {
                 // last one
-                final List<Wagon> wagons = group.getTypedParse(WagonParser.class).parse(group.getInputLines());
-                builder.wagons(wagons);
+                parseAndSet(group, builder::wagons, WagonParser.class);
 
                 singlePaths.add(builder.build());
                 builder = SinglePath.builder();
-                expectedNextParser = TrainMetaInfoParser.class;
+                expectedNextParser = TrainPathParser.class;
             }
         }
 
         return singlePaths;
     }
 
+    private <P extends InputLineParsingInterface<?>, O> void parseAndSet(
+            GroupBuilder.Group group,
+            Function<O, SinglePath.SinglePathBuilder> setFc,
+            Class<P> parserClass) {
+
+        final P typedParser = group.getTypedParser(parserClass);
+        final List<GroupBuilder.InputLine> filtered = group.getInputLines()
+                .stream()
+                .filter(typedParser::shouldConsumeLine)
+                .peek(GroupBuilder.InputLine::consume)
+                .collect(Collectors.toUnmodifiableList());
+
+        if (typedParser instanceof InputLineParsingInterface.SingleObject) {
+            final PrintableInterface printableInterface = ((InputLineParsingInterface.SingleObject<?>) typedParser).parseToOne(filtered);
+            setFc.apply((O) printableInterface);
+        } else {
+            setFc.apply((O) typedParser.parse(filtered));
+        }
+    }
+
     public ParseMonitor getParseMonitor() {
         return parseMonitor;
     }
 
-    private String parsePlainTextByTika(Path pathToFile) throws IOException, SAXException, TikaException {
+    private String parseToPlainTextByTika(Path pathToFile) throws IOException, SAXException, TikaException {
         Preconditions.checkArgument(Files.exists(pathToFile), "File %s does not exist!", pathToFile.toString());
         Preconditions.checkArgument(Files.isReadable(pathToFile), "File %s is not readable!", pathToFile.toString());
 

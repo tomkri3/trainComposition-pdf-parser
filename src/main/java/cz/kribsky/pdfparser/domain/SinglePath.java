@@ -11,4 +11,5 @@ public class SinglePath {
     private final TrainMetaInfo trainMetaInfo;
     private final List<Engine> engines;
     private final List<Wagon> wagons;
+    private final TrainPath trainPath;
 }

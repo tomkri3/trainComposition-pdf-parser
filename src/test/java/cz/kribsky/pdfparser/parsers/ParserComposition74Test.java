@@ -2,16 +2,16 @@ package cz.kribsky.pdfparser.parsers;
 
 
 import cz.kribsky.pdfparser.CommonTests;
-import cz.kribsky.pdfparser.domain.Engine;
-import cz.kribsky.pdfparser.domain.MainTrainMetaInfo;
-import cz.kribsky.pdfparser.domain.TrainMetaInfo;
-import cz.kribsky.pdfparser.domain.Wagon;
+import cz.kribsky.pdfparser.domain.*;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import static cz.kribsky.pdfparser.CommonTests.getAllCollections;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ParserComposition74Test {
@@ -19,7 +19,7 @@ class ParserComposition74Test {
     @Test
     void shouldParseCorrectlyWagons() {
         final Path pathToFile = CommonTests.getPdfPath74();
-        final Collection<Wagon> parse = new ParserComposition().parseCompost(pathToFile).getWagons();
+        final Collection<Wagon> parse = getAllCollections(new ParserComposition().parseCompost(pathToFile), SinglePath::getWagons);
 
         assertThat(parse)
                 .hasSize(78);
@@ -46,7 +46,11 @@ class ParserComposition74Test {
     void shouldParseCorrectlyTrainMetaInfo() {
         final Path pathToFile = CommonTests.getPdfPath74();
 
-        final List<TrainMetaInfo> parse = new ParserComposition().parseCompost(pathToFile).getTrainMetaInfo();
+        final List<TrainMetaInfo> parse = new ParserComposition().parseCompost(pathToFile)
+                .getSinglePaths()
+                .stream()
+                .map(SinglePath::getTrainMetaInfo)
+                .collect(Collectors.toUnmodifiableList());
 
         final TrainMetaInfo metaInfo = new TrainMetaInfo();
         metaInfo.setWeight(3172);
@@ -92,9 +96,21 @@ class ParserComposition74Test {
         final Engine expected3 = new Engine();
         expected3.setDesignationNumber("91 56 6183 004-1");
 
-        assertThat(new ParserComposition().parseCompost(pathToFile).getEngines())
+        assertThat(getAllCollections(new ParserComposition().parseCompost(pathToFile), SinglePath::getEngines))
                 .isNotNull()
                 .containsExactly(expected, expected2, expected3);
+    }
+
+    @Test
+    void shouldParseTrainPath(){
+        final Path pathToFile = CommonTests.getPdfPath74();
+
+        final TrainPath expected = TrainPath.builder().fromStation("CZ - 30025 Bohumín-Vrbice st.hr").toStation("CZ - 38014 Ostrava levé n.").build();
+        final TrainPath expected2 = TrainPath.builder().fromStation("CZ - 38014 Ostrava levé n.").toStation("CZ - 34424 Ostrava-Bartovice").build();
+        final List<TrainPath> collect = new ParserComposition().parseCompost(pathToFile).getSinglePaths().stream().map(SinglePath::getTrainPath).collect(Collectors.toUnmodifiableList());
+
+        assertThat(collect)
+                .containsExactly(expected, expected2);
     }
 
 

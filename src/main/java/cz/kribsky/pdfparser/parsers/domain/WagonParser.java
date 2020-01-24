@@ -1,10 +1,13 @@
 package cz.kribsky.pdfparser.parsers.domain;
 
 import cz.kribsky.pdfparser.domain.Wagon;
+import cz.kribsky.pdfparser.parsers.GroupBuilder;
 import cz.kribsky.pdfparser.parsers.InputLineParsingInterface;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class WagonParser implements InputLineParsingInterface<Wagon> {
 
@@ -23,18 +26,20 @@ public class WagonParser implements InputLineParsingInterface<Wagon> {
     public static final String HEADER = "Poř Označení vozu PočNapr VůzDel VůzHmotn ZasHmot Brzd BrzdHmotn MaxRychl";
 
     @Override
-    public boolean shouldConsumeLine(String s) {
-        final Matcher matcher = PATTERN.matcher(s);
+    public boolean shouldConsumeLine(GroupBuilder.InputLine line) {
+        final Matcher matcher = PATTERN.matcher(line.getLine());
         return matcher.find();
     }
 
     @Override
-    public boolean isHeader(String s) {
-        return s.trim().equals(HEADER);
+    public List<Wagon> parse(List<GroupBuilder.InputLine> inputLines) {
+        return inputLines.stream()
+                .map(GroupBuilder.InputLine::getLine)
+                .map(this::parse)
+                .collect(Collectors.toUnmodifiableList());
     }
 
-    @Override
-    public Wagon parse(String s) {
+    private Wagon parse(String s) {
         final Matcher matcher = PATTERN.matcher(s);
         matcher.find();
 

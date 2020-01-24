@@ -1,12 +1,19 @@
 package cz.kribsky.pdfparser.parsers;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.MoreCollectors;
 import com.sun.istack.NotNull;
-import lombok.*;
+import cz.kribsky.pdfparser.domain.PrintableInterface;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GroupBuilder {
     private final List<InputLine> convert;
@@ -25,22 +32,44 @@ public class GroupBuilder {
         return List.copyOf(inputLines);
     }
 
-    public List<Group> groupLinesByHeader(Collection<InputLineParsingInterface> parsingInterfaces) {
+    public List<Group> groupLinesByHeader(Collection<InputLineParsingInterface<?>> parsingInterfaces) {
         List<Group> groups = new ArrayList<>();
 
         for (InputLine inputLine : convert) {
-            for (InputLineParsingInterface parsingInterface : parsingInterfaces) {
-                if (parsingInterface.isHeader(inputLine.getLine())) {
-                    inputLine.consume();
-                    groups.add(new Group(parsingInterface));
-                }
-                if (!groups.isEmpty()) {
-                    groups.get(groups.size()).getInputLines().add(inputLine);
-                }
+            final Optional<InputLineParsingInterface<?>> canConsumeHeader = parsingInterfaces.stream()
+                    .filter(inputLineParsingInterface -> inputLineParsingInterface.shouldConsumeLine(inputLine))
+                    .collect(MoreCollectors.toOptional());
+
+            if (canConsumeHeader.isPresent() && !getLastGroup(groups).isSameParserClass(canConsumeHeader.get().getClass())) {
+                groups.add(new Group(canConsumeHeader.get()));
+            }
+
+            if (!groups.isEmpty()) {
+                getLastGroup(groups)
+                        .getInputLines()
+                        .add(inputLine);
             }
         }
 
         return groups;
+    }
+
+    private Group getLastGroup(List<Group> groups) {
+        if(groups.isEmpty()){
+            return new Group(new InputLineParsingInterface<PrintableInterface>() {
+
+                @Override
+                public boolean shouldConsumeLine(InputLine s) {
+                    return false;
+                }
+
+                @Override
+                public List<PrintableInterface> parse(List<InputLine> inputLines) {
+                    return null;
+                }
+            });
+        }
+        return groups.get(groups.size() - 1);
     }
 
     /**
@@ -50,23 +79,31 @@ public class GroupBuilder {
     @ToString
     @EqualsAndHashCode
     public static class Group {
-        private InputLineParsingInterface parser;
+        private InputLineParsingInterface<?> parser;
         private List<InputLine> inputLines = new ArrayList<>();
 
-        public Group(InputLineParsingInterface parser) {
+        public Group(InputLineParsingInterface<?> parser) {
             this.parser = parser;
         }
 
-        boolean isSameParserClass(@NotNull Class aClass){
+        boolean isSameParserClass(@NotNull Class<?> aClass) {
             return parser.getClass() == aClass;
         }
 
-        <T extends InputLineParsingInterface> T getTypedParse(@NotNull Class<T> aClass){
+        boolean isSameParserClass(@NotNull Group otherGroup) {
+            return parser.getClass() == otherGroup.parser.getClass();
+        }
+
+        <T extends InputLineParsingInterface<?>> T getTypedParser(@NotNull Class<T> aClass) {
             return (T) parser;
         }
 
-        public List<InputLine> getInputLines() {
+        List<InputLine> getInputLines() {
             return inputLines;
+        }
+
+        String debugOutput() {
+            return "Group{ name=" + parser.getClass().getName() + ", lines= "+ inputLines.stream().map(InputLine::getLineNumber).map(Object::toString).collect(Collectors.joining(", ")) + "}";
         }
     }
 
@@ -81,8 +118,8 @@ public class GroupBuilder {
 
         public void consume() {
             Preconditions.checkArgument(!isConsumed,
-                    "Trying to consume, already consumed line! lineNumber %s\nline %s",
-                    line
+                    "Trying to consume, already consumed line! lineNumber %s\nline text '%s'",
+                    lineNumber, line
             );
             isConsumed = true;
         }

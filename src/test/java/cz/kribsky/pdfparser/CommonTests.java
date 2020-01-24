@@ -1,10 +1,16 @@
 package cz.kribsky.pdfparser;
 
+import cz.kribsky.pdfparser.domain.SinglePath;
+import cz.kribsky.pdfparser.domain.TrainCompost;
 import org.junit.jupiter.api.Assertions;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class CommonTests {
 
@@ -19,5 +25,14 @@ public class CommonTests {
         Assertions.assertTrue(Files.exists(pathToFile));
         Assertions.assertTrue(Files.isReadable(pathToFile));
         return pathToFile;
+    }
+
+    public static <O> List<O> getAllCollections(TrainCompost trainCompost, Function<SinglePath, List<O>> getFc) {
+        return trainCompost
+                .getSinglePaths()
+                .stream()
+                .map(getFc)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toUnmodifiableList());
     }
 }
