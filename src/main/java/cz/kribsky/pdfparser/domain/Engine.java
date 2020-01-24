@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * This class represents part in pdf which starts "Údaje o hnacích vozidlech"
+ */
 @Data
 public class Engine implements PrintableInterface {
     private String designationNumber;

@@ -1,6 +1,8 @@
 package cz.kribsky.pdfparser;
 
 import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,6 +11,7 @@ import java.util.Arrays;
 
 public class Main {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
     public static final String OUTPUT_SUFFIX = "_converted.xlsx";
 
     public static void main(String[] args) throws Exception {
@@ -16,11 +19,11 @@ public class Main {
         final Path givenPath = Paths.get(args[0]);
         final Runner runner = new Runner();
         if (Files.isRegularFile(givenPath)) {
-            System.out.println("Converting file: " + givenPath);
+            LOGGER.info("Converting file: {}", givenPath);
             runner.convertFile(givenPath);
             System.exit(0);
         } else if (Files.isDirectory(givenPath)) {
-            System.out.println("Converting directory: " + givenPath);
+            LOGGER.info("Converting directory: {}", givenPath);
             runner.convertDirectory(givenPath);
             System.exit(0);
         }

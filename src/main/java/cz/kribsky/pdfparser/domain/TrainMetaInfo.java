@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * This class represents part in pdf which starts "Údaje o vlaku"
+ */
 @Data
 public class TrainMetaInfo implements PrintableInterface {
     private Integer weight;

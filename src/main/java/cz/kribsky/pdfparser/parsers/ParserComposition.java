@@ -1,11 +1,9 @@
 package cz.kribsky.pdfparser.parsers;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import cz.kribsky.pdfparser.domain.PrintableInterface;
 import cz.kribsky.pdfparser.domain.Train;
 import cz.kribsky.pdfparser.domain.TrainCompost;
-import cz.kribsky.pdfparser.domain.TrainMetaInfo;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -13,6 +11,8 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.ContentHandlerDecorator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ParserComposition {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParserComposition.class);
 
     private final boolean throwExceptionWhenRaised;
     private final ParseMonitor parseMonitor = new ParseMonitor();
@@ -36,7 +37,8 @@ public class ParserComposition {
     }
 
     public TrainCompost parseCompost(Path pathToFile) {
-        String[] lines = null;
+        LOGGER.info("Processing file: {}", pathToFile.toAbsolutePath());
+        String[] lines;
         try {
             lines = parsePlainTextByTika(pathToFile).split("\n");
 
@@ -52,7 +54,7 @@ public class ParserComposition {
         } catch (Exception e) {
             String x = "Exception when processing file: '" + pathToFile.toAbsolutePath().toString() + "'";
             parseMonitor.addException(e, x);
-            if(throwExceptionWhenRaised){
+            if (throwExceptionWhenRaised) {
                 throw new RuntimeException(e);
             } else {
                 return new TrainCompost(new Train(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());

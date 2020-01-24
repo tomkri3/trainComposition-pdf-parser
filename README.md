@@ -4,10 +4,12 @@
 - 1.0 first version
 - 1.1 another
 - 1.2 exception swallowing, better error log, more TraiMetaInfo in one pdf
+- 1.3 adding logback, reducing warning, kontingent
 
 simple application for parsing pdf then exporting to csv file
 ## Requirements
 java 11 in system which we want to run
+https://adoptopenjdk.net/?variant=openjdk11&jvmVariant=hotspot
 
 ## Directory with runnable output
 this is where you want to download jar file (excutable java) 

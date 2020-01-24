@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Main class which is equal to OnePdf
+ */
 @Data
 public class TrainCompost {
     private final Train train;

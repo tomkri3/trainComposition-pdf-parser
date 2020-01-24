@@ -2,7 +2,10 @@ package cz.kribsky.pdfparser.printers;
 
 import com.google.common.collect.Iterables;
 import cz.kribsky.pdfparser.domain.PrintableInterface;
-import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,16 +54,7 @@ public class ExcelPrinter implements PrinterInterface, AutoCloseable {
 
     @Override
     public void writeAndFinish(File file) throws IOException {
-        // TODO remove magic number!
-//        autosizeAllCollumns(sheet, 64);
         workbook.write(Files.newOutputStream(file.toPath()));
-    }
-
-    private void autosizeAllCollumns(XSSFSheet sheet, int headerSize) {
-        System.out.println("Autosizing excel cells ...");
-        for (int i = 0; i < headerSize; i++) {
-            sheet.autoSizeColumn(i);
-        }
     }
 
     private void fillRow(List<String> values, XSSFRow row) {

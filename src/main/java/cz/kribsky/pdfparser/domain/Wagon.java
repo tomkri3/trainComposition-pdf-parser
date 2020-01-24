@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * This is single Wagon in part Údaje o vozech
+ */
 @Data
 public class Wagon implements PrintableInterface {
     int order;

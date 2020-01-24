@@ -6,7 +6,8 @@ import cz.kribsky.pdfparser.parsers.ParserComposition;
 import cz.kribsky.pdfparser.printers.ExcelPrinter;
 import cz.kribsky.pdfparser.printers.PrinterInterface;
 import cz.kribsky.pdfparser.printers.TrainCompostPrintable;
-import org.apache.poi.xssf.usermodel.helpers.XSSFIgnoredErrorHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +21,7 @@ import java.util.stream.Stream;
 import static cz.kribsky.pdfparser.Main.OUTPUT_SUFFIX;
 
 public class Runner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Runner.class);
 
     public void convertFile(Path fileToRead) throws Exception {
         ParserComposition parserComposition = new ParserComposition(false);
@@ -35,17 +37,16 @@ public class Runner {
     private void finish(ParserComposition parserComposition, Path pathToWrite) {
         final ParseMonitor parseMonitor = parserComposition.getParseMonitor();
         for (Map.Entry<Exception, String> entry : parseMonitor.getExceptionStringMap().entrySet()) {
-            System.err.println("Error comment : " + entry.getValue());
-            entry.getKey().printStackTrace();
+            LOGGER.warn("Error comment : {}", entry.getValue());
+            LOGGER.warn("Stack trace", entry.getKey());
         }
 
         if (parseMonitor.hasRisenException()) {
-            System.err.println("-------------------------");
-            parseMonitor.getExceptionStringMap().values().forEach(System.err::println);
-            System.err.println();
-            System.err.printf("Everything finished with total ERRORs: %s, new file is: %s", parseMonitor.getExceptionStringMap().size(), pathToWrite.toAbsolutePath());
+            LOGGER.warn("-------------------------");
+            parseMonitor.getExceptionStringMap().values().forEach(LOGGER::warn);
+            LOGGER.warn("Everything finished with total ERRORs: {}, new file is: {}", parseMonitor.getExceptionStringMap().size(), pathToWrite.toAbsolutePath());
         } else {
-            System.out.println("Everything finished OK, new file is: " + pathToWrite.toAbsolutePath());
+            LOGGER.info("Everything finished OK, new file is: {}", pathToWrite.toAbsolutePath());
         }
 
     }
@@ -66,7 +67,6 @@ public class Runner {
             try (ExcelPrinter excelPrinter = new ExcelPrinter()) {
                 excelPrinter.init(pathToWrite.toFile(), Collections.emptyList());
                 walk.filter(path -> path.toString().endsWith(".pdf"))
-                        .peek(path -> System.out.println("Processing file: " + path.toAbsolutePath()))
                         .map(parserComposition::parseCompost)
                         .map(TrainCompostPrintable::new)
                         .forEach(trainCompostPrintable -> {
