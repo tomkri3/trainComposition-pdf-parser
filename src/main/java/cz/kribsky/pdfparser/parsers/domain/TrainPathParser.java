@@ -22,10 +22,10 @@ public class TrainPathParser implements InputLineParsingInterface.SingleObject<T
         final TrainPath.TrainPathBuilder builder = TrainPath.builder();
         for (GroupBuilder.InputLine line : lines) {
             if(line.getLine().startsWith(FROM_STATION)){
-                builder.fromStation(line.getLine().replaceAll(FROM_STATION, ""));
+                builder.fromStation(line.getLine().replace(FROM_STATION, ""));
             }
             if(line.getLine().startsWith(TO_STATION)){
-                builder.toStation(line.getLine().replaceAll(TO_STATION, ""));
+                builder.toStation(line.getLine().replace(TO_STATION, ""));
             }
         }
 

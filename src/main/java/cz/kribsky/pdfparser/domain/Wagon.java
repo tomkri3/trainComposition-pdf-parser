@@ -15,8 +15,6 @@ public class Wagon implements PrintableInterface {
     int numberOfAxles;
     int lengthOfWagon;
     int weight;
-
-    // TODO translate meaning
     int zasHmot;
     int breake;
     int weightBreaking;

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class WagonParser implements InputLineParsingInterface<Wagon> {
 
     /**
-     * TODO example, missing some zeroes so its not final regex
+     * its POSSIBLE that are missing some zeroes so its not final regex
      * Poř Označení vozu PočNapr VůzDel VůzHmotn ZasHmot Brzd BrzdHmotn MaxRychl
      * 1 33 52 5412 025-6 4 2170 26500 0 100
      */

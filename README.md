@@ -4,7 +4,7 @@
 - 1.0 first version
 - 1.1 another
 - 1.2 exception swallowing, better error log, more TraiMetaInfo in one pdf
-- 1.3 adding logback, reducing warning, kontingent
+- 1.3 adding logback, reducing warning, kontingent table
 
 simple application for parsing pdf then exporting to csv file
 ## Requirements

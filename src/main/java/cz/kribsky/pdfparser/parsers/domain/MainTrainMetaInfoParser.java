@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 
 public class MainTrainMetaInfoParser implements InputLineParsingInterface.SingleObject<MainTrainMetaInfo> {
 
-    private static final String TRAIN_STRING = "VLAK";
     private static final Pattern TRAIN_NUMBER_PATTERN = Pattern.compile("(\\d+)\\s([\\d\\w-]+/){5}(\\d+)");
     private static final String START_STATION = "Stanice výchozí: ";
     private static final String END_STATION = "Stanice cílová: ";

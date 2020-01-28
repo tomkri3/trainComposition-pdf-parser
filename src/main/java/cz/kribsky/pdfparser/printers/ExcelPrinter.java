@@ -66,7 +66,7 @@ public class ExcelPrinter implements PrinterInterface, AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         workbook.close();
     }
 }

@@ -5,7 +5,7 @@ import cz.kribsky.pdfparser.parsers.ParseMonitor;
 import cz.kribsky.pdfparser.parsers.ParserComposition;
 import cz.kribsky.pdfparser.printers.ExcelPrinter;
 import cz.kribsky.pdfparser.printers.PrinterInterface;
-import cz.kribsky.pdfparser.printers.TrainCompostPrintable;
+import cz.kribsky.pdfparser.printers.TrainCompostPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class Runner {
 
     public void convertFile(Path fileToRead) throws Exception {
         ParserComposition parserComposition = new ParserComposition(false);
-        final List<PrintableInterface> dataRows = new TrainCompostPrintable(parserComposition.parseCompost(fileToRead)).getDataRows();
+        final List<PrintableInterface> dataRows = new TrainCompostPrinter(parserComposition.parseCompost(fileToRead)).getDataRows();
         final Path pathToWrite = preparePathToWrite(fileToRead);
         try (PrinterInterface printer = new ExcelPrinter()) {
             printer.printToFileAndFinish(dataRows, pathToWrite.toFile());
@@ -59,7 +59,7 @@ public class Runner {
         return pathToWrite;
     }
 
-    public void convertDirectory(Path givenPath) throws Exception {
+    public void convertDirectory(Path givenPath) throws IOException {
         final ParserComposition parserComposition = new ParserComposition(false);
         final Path pathToWrite = preparePathToWrite(Paths.get(givenPath.toString(), "consolidation" + OUTPUT_SUFFIX));
 
@@ -68,10 +68,10 @@ public class Runner {
                 excelPrinter.init(pathToWrite.toFile(), Collections.emptyList());
                 walk.filter(path -> path.toString().endsWith(".pdf"))
                         .map(parserComposition::parseCompost)
-                        .map(TrainCompostPrintable::new)
-                        .forEach(trainCompostPrintable -> {
-                            excelPrinter.printHeader(trainCompostPrintable.getDataRows());
-                            excelPrinter.printCollection(trainCompostPrintable.getDataRows());
+                        .map(TrainCompostPrinter::new)
+                        .forEach(trainCompostPrinter -> {
+                            excelPrinter.printHeader(trainCompostPrinter.getDataRows());
+                            excelPrinter.printCollection(trainCompostPrinter.getDataRows());
                         });
                 excelPrinter.writeAndFinish(pathToWrite.toFile());
             }

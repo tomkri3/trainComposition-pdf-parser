@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.List;
 
 public interface PrinterInterface extends AutoCloseable {
-    default void printToFileAndFinish(List<? extends PrintableInterface> wagons, File file) throws Exception {
+
+    default void printToFileAndFinish(List<? extends PrintableInterface> wagons, File file) throws IOException {
         init(file, wagons);
         printHeader(wagons);
         printCollection(wagons);

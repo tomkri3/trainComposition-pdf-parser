@@ -23,7 +23,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -46,8 +45,10 @@ public class ParserComposition {
         String[] lines;
         try {
             lines = parseToPlainTextByTika(pathToFile).split("\n");
-            LOGGER.debug("Parsed PDF is");
-            LOGGER.debug(String.join("\n", lines));
+            if(LOGGER.isDebugEnabled()){
+                LOGGER.debug("Parsed PDF is");
+                LOGGER.debug(String.join("\n", lines));
+            }
 
             final List<GroupBuilder.Group> groups = new GroupBuilder(lines)
                     .groupLinesByHeader(
@@ -98,7 +99,9 @@ public class ParserComposition {
         final List<SinglePath> singlePaths = new ArrayList<>();
         SinglePath.SinglePathBuilder builder = SinglePath.builder();
         Class<?> expectedNextParser = null;
-        LOGGER.debug("Groups {}",groups.stream().map(GroupBuilder.Group::debugOutput).collect(Collectors.joining("\n")));
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("Groups {}", groups.stream().map(GroupBuilder.Group::debugOutput).collect(Collectors.joining("\n")));
+        }
 
         for (GroupBuilder.Group group : groups) {
             if (expectedNextParser != null) {

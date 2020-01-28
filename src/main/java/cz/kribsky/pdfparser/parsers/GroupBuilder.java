@@ -2,17 +2,10 @@ package cz.kribsky.pdfparser.parsers;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.MoreCollectors;
-import com.sun.istack.NotNull;
 import cz.kribsky.pdfparser.domain.PrintableInterface;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GroupBuilder {
@@ -65,7 +58,7 @@ public class GroupBuilder {
 
                 @Override
                 public List<PrintableInterface> parse(List<InputLine> inputLines) {
-                    return null;
+                    return Collections.emptyList();
                 }
             });
         }
@@ -86,15 +79,15 @@ public class GroupBuilder {
             this.parser = parser;
         }
 
-        boolean isSameParserClass(@NotNull Class<?> aClass) {
+        boolean isSameParserClass(@NonNull Class<?> aClass) {
             return parser.getClass() == aClass;
         }
 
-        boolean isSameParserClass(@NotNull Group otherGroup) {
+        boolean isSameParserClass(@NonNull Group otherGroup) {
             return parser.getClass() == otherGroup.parser.getClass();
         }
 
-        <T extends InputLineParsingInterface<?>> T getTypedParser(@NotNull Class<T> aClass) {
+        <T extends InputLineParsingInterface<?>> T getTypedParser(@NonNull Class<T> aClass) {
             return (T) parser;
         }
 
