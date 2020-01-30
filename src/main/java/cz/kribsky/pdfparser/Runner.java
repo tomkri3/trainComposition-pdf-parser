@@ -61,7 +61,7 @@ public class Runner {
 
     public void convertDirectory(Path givenPath) throws IOException {
         final ParserComposition parserComposition = new ParserComposition(false);
-        final Path pathToWrite = preparePathToWrite(Paths.get(givenPath.toString(), "consolidation" + OUTPUT_SUFFIX));
+        final Path pathToWrite = preparePathToWrite(Paths.get(givenPath.toString(), "consolidation"));
 
         try (Stream<Path> walk = Files.walk(givenPath)) {
             try (ExcelPrinter excelPrinter = new ExcelPrinter()) {
