@@ -15,7 +15,7 @@ public class Main {
     public static final String OUTPUT_SUFFIX = "_converted.xlsx";
 
     public static void main(String[] args) throws Exception {
-        Preconditions.checkArgument(args.length == 1, "Expecting exactly one argument but got %s arguments are: %s", args.length, Arrays.toString(args));
+        Preconditions.checkArgument(args.length == 1, "Expecting exactly one argument but got %s arguments which i get are: %s", args.length, Arrays.toString(args));
         final Path givenPath = Paths.get(args[0]);
         final Runner runner = new Runner();
         if (Files.isRegularFile(givenPath)) {
@@ -28,6 +28,6 @@ public class Main {
             System.exit(0);
         }
 
-        throw new IllegalArgumentException("You need to enter directory or file which is readable and exists!");
+        throw new IllegalArgumentException("You need to enter directory or file which is readable and exists! " + Arrays.toString(args));
     }
 }
