@@ -14,6 +14,9 @@ import java.util.stream.Collectors;
 import static cz.kribsky.pdfparser.CommonTests.getAllCollections;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * PDF 74 is most complex pdf in tests. More paths (two), each is different. Multiple engines
+ */
 class ParserComposition74Test {
 
     @Test

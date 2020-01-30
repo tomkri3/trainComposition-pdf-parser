@@ -28,13 +28,14 @@ public class WagonParser implements InputLineParsingInterface<Wagon> {
     @Override
     public boolean shouldConsumeLine(GroupBuilder.InputLine line) {
         final Matcher matcher = PATTERN.matcher(line.getLine());
-        return matcher.find();
+        return matcher.find() || line.getLine().equals(HEADER);
     }
 
     @Override
     public List<Wagon> parse(List<GroupBuilder.InputLine> inputLines) {
         return inputLines.stream()
                 .map(GroupBuilder.InputLine::getLine)
+                .filter(s -> !s.equals(HEADER))
                 .map(this::parse)
                 .collect(Collectors.toUnmodifiableList());
     }

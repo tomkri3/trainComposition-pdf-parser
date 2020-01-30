@@ -1,7 +1,6 @@
 package cz.kribsky.pdfparser.parsers;
 
 
-import com.google.common.collect.MoreCollectors;
 import cz.kribsky.pdfparser.CommonTests;
 import cz.kribsky.pdfparser.domain.*;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,9 @@ import java.util.stream.Collectors;
 import static cz.kribsky.pdfparser.CommonTests.getAllCollections;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * PDF 35 is pdf which is simple, one engine one path, collection of wagons
+ */
 class ParserComposition35Test {
 
     @Test
@@ -82,7 +84,7 @@ class ParserComposition35Test {
     }
 
     @Test
-    void shouldParseTrainPath(){
+    void shouldParseTrainPath() {
         final Path pathToFile = CommonTests.getPdfPath35();
 
         final TrainPath expected = TrainPath.builder().fromStation("CZ - 30145 Lanžhot st.hr.").toStation("CZ - 35737 Přibyslav").build();

@@ -83,8 +83,8 @@ public class GroupBuilder {
             return parser.getClass() == aClass;
         }
 
-        boolean isSameParserClass(@NonNull Group otherGroup) {
-            return parser.getClass() == otherGroup.parser.getClass();
+        Class<?> getParserClass(){
+            return parser.getClass();
         }
 
         <T extends InputLineParsingInterface<?>> T getTypedParser(@NonNull Class<T> aClass) {

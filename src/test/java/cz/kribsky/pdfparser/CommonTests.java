@@ -19,6 +19,11 @@ public class CommonTests {
         Assertions.assertTrue(Files.exists(pathToFile));
         return pathToFile;
     }
+    public static Path getPdfPath1() {
+        final Path pathToFile = Paths.get("src", "test", "resources", "Slození vlaku1.pdf");
+        Assertions.assertTrue(Files.exists(pathToFile));
+        return pathToFile;
+    }
 
     public static Path getPdfPath74() {
         final Path pathToFile = Paths.get("src", "test", "resources", "SlozeniVlaku (74).pdf");

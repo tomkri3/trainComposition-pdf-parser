@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 public class ParserComposition {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParserComposition.class);
+    public static final String NOW_FOUND_GROUP = "now found group {}";
 
     private final boolean throwExceptionWhenRaised;
     private final ParseMonitor parseMonitor = new ParseMonitor();
@@ -46,8 +47,8 @@ public class ParserComposition {
         try {
             lines = parseToPlainTextByTika(pathToFile).split("\n");
             if(LOGGER.isDebugEnabled()){
-                LOGGER.debug("Parsed PDF is");
-                LOGGER.debug(String.join("\n", lines));
+                LOGGER.trace("Parsed PDF is");
+                LOGGER.trace(String.join("\n", lines));
             }
 
             final List<GroupBuilder.Group> groups = new GroupBuilder(lines)
@@ -62,6 +63,7 @@ public class ParserComposition {
                     );
 
             final List<SinglePath> singlePaths = parseSinglePaths(groups);
+            Preconditions.checkArgument(!singlePaths.isEmpty(), "SinglePath must be always be present! Got groups %s", groups);
 
             final MainTrainMetaInfo mainTrainMetaInfo = findMainMetaInfo(groups);
             TrainCompost trainCompost = new TrainCompost(
@@ -112,6 +114,7 @@ public class ParserComposition {
             }
 
             if (group.isSameParserClass(TrainPathParser.class)) {
+                LOGGER.debug(NOW_FOUND_GROUP, group.getParserClass());
                 // first parser
                 Preconditions.checkNotNull(builder);
                 builder = SinglePath.builder();
@@ -120,14 +123,19 @@ public class ParserComposition {
             }
 
             if (group.isSameParserClass(TrainMetaInfoParser.class)) {
+                LOGGER.debug(NOW_FOUND_GROUP, group.getParserClass());
                 parseAndSet(group, builder::trainMetaInfo, TrainMetaInfoParser.class);
                 expectedNextParser = EngineParser.class;
             }
             if (group.isSameParserClass(EngineParser.class)) {
+                LOGGER.debug(NOW_FOUND_GROUP, group.getParserClass());
+
                 parseAndSet(group, builder::engines, EngineParser.class);
                 expectedNextParser = WagonParser.class;
             }
             if (group.isSameParserClass(WagonParser.class)) {
+                LOGGER.debug(NOW_FOUND_GROUP, group.getParserClass());
+
                 // last one
                 parseAndSet(group, builder::wagons, WagonParser.class);
 
